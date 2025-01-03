@@ -19,7 +19,7 @@ mainTomato.addEventListener('click', function (e) {
 const createDrop = () => {
   const tomaDrop = document.createElement('figure')
   tomaDrop.className = 'toma-drop'
-  tomaDrop.style.left = `${getRandomBetween(100)}%`
+  tomaDrop.style.left = `${getRandomBetween(100, -10)}%`
 
   const dropImg = document.createElement('img')
   dropImg.setAttribute('src', `assets/slice${getRandomBetween(5,1)}.png`)
