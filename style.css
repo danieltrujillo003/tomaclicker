@@ -1,0 +1,70 @@
+@keyframes drop {
+  from {
+    transform: translateY(0%);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateY(1800%);
+    opacity: 0;
+  }
+}
+
+body {
+  background: #00FF7F;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  user-select: none;
+  overflow: hidden;
+}
+
+figure {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+figure img {
+  width: 100%;
+}
+
+.toma-drop {
+  width: 80px;
+  margin: 0;
+  position: absolute;
+  top: -10%;
+  animation: drop 3s 0.1s ease-in-out backwards;
+  z-index: -1;
+}
+
+h1, h2 {
+  font-family: "Comic Neue", serif;
+  font-weight: 700;
+  color: tomato;
+  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+.title {
+  font-size: 80px;
+  margin-bottom: 50px;
+  margin-top: 50px;
+}
+
+.main-tomato {
+  width: 500px;
+  height: 500px;
+  margin: 0;
+}
+
+.main-tomato img:active {
+  width: 95%;
+  margin: 0;
+}
+
+.counter {
+  font-size: 60px;
+  margin-bottom: 50px;
+  margin-top: 50px;
+}
