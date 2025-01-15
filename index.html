@@ -16,11 +16,15 @@
     <link rel="manifest" href="assets/icons/site.webmanifest">
   </head>
   <body>
-    <h1 class="title" id="mainTomatoa">TOMA-CLICKER</h1>
-    <figure class="main-tomato" id="mainTomato">
+    <h1 class="title">TOMA-CLICKER</h1>
+    <figure id="main-tomato">
       <img src="assets/mater.png" onerror="this.src='assets/default.png';this.onerror='';" draggable="false">
     </figure>
-    <h2 class="counter" id="counterDisplay"></h2>
+    <h2 id="counter-display"></h2>
+    <audio id="tomato-song">
+      <source src="assets/track.mp3" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
     <script src="main.js"></script>
   </body>
 </html>

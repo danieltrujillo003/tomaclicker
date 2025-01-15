@@ -58,16 +58,16 @@ h1, h2 {
   font-size: 80px;
 }
 
-.main-tomato {
+#main-tomato {
   height: 300px;
   cursor: pointer;
 }
 
-.main-tomato img:active {
+#main-tomato img:active {
   height: 95%;
 }
 
-.counter {
+#counter-display {
   font-size: 60px;
   word-break: break-all;
   height: 70px;
