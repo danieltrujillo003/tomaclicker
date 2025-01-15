@@ -6,8 +6,7 @@ frase.style.display = 'none'
 // set the splash sound
 const tomatoSplash = new Audio('assets/tomatoe.mp3')
 
-let counter = 94
-//let volumeSong = 0.1
+let counter = 0
 counterDisplay.innerText = Math.floor(counter)
 
 mainTomato.addEventListener('click', function (e) {
@@ -18,7 +17,7 @@ mainTomato.addEventListener('click', function (e) {
     tomatoSong.play();
     setTimeout(fraseFinal,34200)
   }
-  
+
   if (counter > 95){
     tomatoSong.volume += 0.005
   }
