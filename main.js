@@ -1,6 +1,8 @@
 const mainTomato = document.getElementById('main-tomato')
 const counterDisplay = document.getElementById('counter-display')
 const tomatoSong = document.getElementById('tomato-song')
+// set the splash sound
+const tomatoSplash = new Audio('assets/tomatoe.mp3')
 
 let counter = 0
 
@@ -18,6 +20,12 @@ mainTomato.addEventListener('click', function (e) {
   if (counter > 300) counter *= 1.2
   if (counter > 10000) counter *= 1.3
   if (counter > 1000000) counter *= 2.0
+  // Lines to control the splash sound
+  tomatoSplash.play()
+  setTimeout(() => {
+    tomatoSplash.pause()
+    tomatoSplash.currentTime = 0
+  }, 300)
 
   counterDisplay.innerText = Math.floor(counter)
   createDrop()
