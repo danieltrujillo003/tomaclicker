@@ -10,6 +10,18 @@
   }
 }
 
+@keyframes frase {
+  from {
+    scale: 0;
+    opacity: 0;
+  }
+
+  to {
+    scale: 100%;
+    opacity: 1;
+  }
+}
+
 html, body {
   height: 100%;
 }
@@ -71,4 +83,9 @@ h1, h2 {
   font-size: 60px;
   word-break: break-all;
   height: 70px;
+}
+
+#frase{
+  font-size: 120px;
+  animation: frase 2s 0.2s ease-in-out backwards;
 }
