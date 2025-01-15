@@ -21,12 +21,7 @@ mainTomato.addEventListener('click', function (e) {
   if (counter > 95){
     tomatoSong.volume += 0.005
   }
-  // if (counter < 1000 && counter > 95) tomatoSong.volume = 0.3
-  // if (counter < 1000000 && counter > 1000) tomatoSong.volume = 0.5
-  // if (counter < 100000000 && counter > 1000000) tomatoSong.volume = 0.7
-  // if (counter < 100000000000 && counter > 100000000) tomatoSong.volume = 0.8
-  tomatoSong.play();
-  //if ( counter === 100 ) playRomanticSong()
+
   if (counter > 100) counter *= 1.1
   if (counter > 300) counter *= 1.2
   if (counter > 10000) counter *= 1.3
@@ -66,10 +61,6 @@ const removeDrop = () => {
 
 const getRandomBetween = (max, min = 0) => {
   return Math.floor(Math.random() * (max - min + 1) + min)
-}
-
-const playRomanticSong = () => {
-  romanticSong.play()
 }
 
 const fraseFinal = () =>{
