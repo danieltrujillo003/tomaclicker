@@ -64,6 +64,7 @@ h1, h2 {
   text-align: center;
   display: flex;
   align-items: center;
+  margin: 0;
 }
 
 .title {
@@ -73,6 +74,7 @@ h1, h2 {
 #main-tomato {
   height: 300px;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 #main-tomato img:active {
@@ -82,10 +84,17 @@ h1, h2 {
 #counter-display {
   font-size: 60px;
   word-break: break-all;
-  height: 70px;
+  height: 200px;
 }
 
-#frase{
-  font-size: 120px;
+#frase {
+  font-size: 7rem;
   animation: frase 2s 0.2s ease-in-out backwards;
+  white-space: break-spaces;
+}
+
+@media screen and (max-width: 620px) {
+  #frase {
+    font-size: 4rem;
+  }
 }
