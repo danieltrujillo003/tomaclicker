@@ -2,94 +2,170 @@ const configRes = await fetch('../config.json');
 const config = await configRes.json();
 const APP_VERSION = config.version;
 
-const mainTomato = document.getElementById('main-tomato')
-const counterDisplay = document.getElementById('counter-display')
-const tomatoSong = document.getElementById('tomato-song')
-const phrase = document.getElementById('phrase')
-
-phrase.style.display = 'none';
-
 console.log(`Tomaclicker v${APP_VERSION} initialized.`);
 
-const counterStart = 80
-let counter = counterStart
-counterDisplay.innerText = Math.floor(counter);
+// ==========================================
+// 1. DOM ELEMENTS & GLOBAL STATE
+// ==========================================
+const mainTomato = document.getElementById('main-tomato');
+const counterDisplay = document.getElementById('counter-display');
+const tomatoSong = document.getElementById('tomato-song');
+const phrase = document.getElementById('phrase');
 
-const handleInteraction = (e) => {
-  // Only prevent default if it's a touch or pointer event to avoid breaking desktop clicks
-  if (e.cancelable) e.preventDefault();
+// Initial UI State
+// Initial counterDisplay masks the first silent tap required to unlock iOS audio policies
+counterDisplay.innerText = '-';
+phrase.style.display = 'none';
 
-  // On the first click, "unlock" the main song for iOS
-  if (counter === counterStart) {
-    tomatoSong.play().then(() => tomatoSong.pause());
+// Game State
+let counterStart = 0;
+let hasUnlockedAudio = false;
+
+// ==========================================
+// 2. AUDIO ENGINE & ROUTING
+// ==========================================
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+const audioCtx = new AudioContext();
+
+let splashAudioBuffer = null;
+let songGainNode = null;
+let songSource = null;
+
+// Dedicated GainNode to decouple SFX volume from the global media volume
+const splashGainNode = audioCtx.createGain();
+splashGainNode.gain.value = 1.0;
+splashGainNode.connect(audioCtx.destination);
+
+// Decode audio data into memory on load for zero-latency playback
+const loadSplashSound = async () => {
+  try {
+    const response = await fetch('../assets/tomatoe.mp3');
+    const arrayBuffer = await response.arrayBuffer();
+    splashAudioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+  } catch (error) {
+    console.error("Error decoding splash audio:", error);
   }
-
-  counter++
-
-  if (counter === 95) {
-    tomatoSong.volume = 0.1;
-    tomatoSong.play().catch(err => console.error("Playback blocked:", err));
-    setTimeout(finalPhrase,34200)
-  }
-
-  if (counter > 95 && tomatoSong.volume < 1){
-    // Clamp volume to a maximum of 1.0 to avoid errors
-    tomatoSong.volume = Math.min(1, tomatoSong.volume + 0.005);
-  }
-
-  if (counter > 100) counter *= 1.1
-  if (counter > 300) counter *= 1.2
-  if (counter > 10000) counter *= 1.3
-  if (counter > 1000000) counter *= 2.0
-
-  playSplash();
-
-  counterDisplay.innerText = Math.floor(counter)
-  createDrop()
 };
-
-// Use pointerdown for faster response on both desktop and mobile
-mainTomato.addEventListener('pointerdown', handleInteraction);
+loadSplashSound();
 
 const playSplash = () => {
-  // Creating a new instance allows sounds to overlap on rapid clicks
-  const sound = new Audio('../assets/tomatoe.mp3');
-  sound.play().catch(() => { /* Ignore errors if clicking too fast */ });
+  if (!splashAudioBuffer) return;
+  const source = audioCtx.createBufferSource();
+  source.buffer = splashAudioBuffer;
+  source.connect(splashGainNode);
+  source.start(0);
+};
 
-  // The original logic truncated the sound at 300ms
-  setTimeout(() => {
-    sound.pause();
-    sound.remove(); // Help with memory cleanup
-  }, 300);
-}
+// Syncing UI events to the media clock rather than the JS Event Loop to avoid drift
+const checkEndingTime = () => {
+  if (tomatoSong.currentTime >= 34.2) {
+    finalPhrase();
+    tomatoSong.removeEventListener('timeupdate', checkEndingTime);
+  }
+};
+tomatoSong.addEventListener('timeupdate', checkEndingTime);
+
+// ==========================================
+// 3. UI & GAME LOGIC
+// ==========================================
+const getRandomBetween = (max, min = 0) => {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+};
 
 const createDrop = () => {
-  const tomaDrop = document.createElement('figure')
-  tomaDrop.className = 'toma-drop'
-  tomaDrop.style.left = `${getRandomBetween(100, -10)}%`
+  requestAnimationFrame(() => {
+    const tomaDrop = document.createElement('figure');
+    tomaDrop.className = 'toma-drop';
+    tomaDrop.style.left = `${getRandomBetween(100, -10)}%`;
 
-  const dropImg = document.createElement('img')
-  dropImg.src = `../assets/slice${getRandomBetween(5,1)}.png`
-  dropImg.onerror = () => { dropImg.src = '../assets/default.png'; };
-  dropImg.draggable = false
+    const dropImg = document.createElement('img');
+    dropImg.src = `../assets/slice${getRandomBetween(5, 1)}.png`;
+    dropImg.onerror = () => { dropImg.src = '../assets/default.png'; };
+    dropImg.draggable = false;
 
-  // Clean up the element automatically when the animation ends
-  tomaDrop.addEventListener('animationend', () => {
-    tomaDrop.remove();
+    tomaDrop.addEventListener('animationend', () => {
+      tomaDrop.remove();
+    }, { once: true });
+
+    tomaDrop.appendChild(dropImg);
+    document.body.appendChild(tomaDrop);
   });
+};
 
-  tomaDrop.appendChild(dropImg)
-  document.body.appendChild(tomaDrop)
-}
-
-const getRandomBetween = (max, min = 0) => {
-  return Math.floor(Math.random() * (max - min + 1) + min)
-}
-
-const finalPhrase = () =>{
+const finalPhrase = () => {
   phrase.style.display = 'block';
-  const title = document.querySelector('h1.title');
-  title.style.display = 'none';
+  document.querySelector('h1.title').style.display = 'none';
   mainTomato.style.display = 'none';
   counterDisplay.style.display = 'none';
-}
+};
+
+const triggerGameLogicUI = () => {
+  if (counterStart === 95) {
+    songGainNode.gain.value = 0.05;
+    tomatoSong.play().catch(() => console.log("Playback blocked natively."));
+  }
+
+  // Audio Ducking: Crossfade background music and SFX to shift user focus
+  if (counterStart > 95) {
+    if (songGainNode.gain.value < 1) {
+      songGainNode.gain.value = Math.min(1, songGainNode.gain.value + 0.005);
+    }
+    if (splashGainNode.gain.value > 0.4) {
+      splashGainNode.gain.value = Math.max(0.4, splashGainNode.gain.value - 0.005);
+    }
+  }
+
+  if (counterStart > 100) counterStart *= 1.1;
+  if (counterStart > 300) counterStart *= 1.2;
+  if (counterStart > 10000) counterStart *= 1.3;
+  if (counterStart > 1000000) counterStart *= 2.0;
+
+  counterDisplay.innerText = Math.floor(counterStart);
+  createDrop();
+};
+
+// ==========================================
+// 4. CORE INTERACTION CONTROLLER
+// ==========================================
+const handleInteraction = (e) => {
+  if (e.cancelable) e.preventDefault();
+
+  // First tap: Unlocks iOS audio context silently
+  if (!hasUnlockedAudio) {
+    hasUnlockedAudio = true;
+    audioCtx.resume();
+
+    // iOS Hack: Safari aggressively suspends audio unless a sound is played immediately
+    // upon user interaction. This plays a 1ms silent buffer to permanently unlock the engine.
+    const silentBuffer = audioCtx.createBuffer(1, 1, 22050);
+    const silentSource = audioCtx.createBufferSource();
+    silentSource.buffer = silentBuffer;
+    silentSource.connect(audioCtx.destination);
+    silentSource.start();
+
+    if (!songGainNode) {
+      songGainNode = audioCtx.createGain();
+      songGainNode.gain.value = 0;
+      songGainNode.connect(audioCtx.destination);
+
+      // Route the HTMLAudioElement through Web Audio API for precise mathematical volume control
+      songSource = audioCtx.createMediaElementSource(tomatoSong);
+      songSource.connect(songGainNode);
+    }
+    tomatoSong.load();
+
+    counterDisplay.innerText = Math.floor(counterStart);
+    return;
+  }
+
+  // Subsequent taps: Full gameplay loop
+  counterStart++;
+  triggerGameLogicUI();
+  playSplash();
+};
+
+// ==========================================
+// 5. EVENT BINDINGS
+// ==========================================
+// 'pointerdown' unifies touch/mouse and eliminates the 300ms click delay on mobile
+mainTomato.addEventListener('pointerdown', handleInteraction);

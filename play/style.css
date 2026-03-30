@@ -24,6 +24,9 @@
 
 html, body {
   height: 100%;
+
+  /* Modern standard to completely disable rubber-band bouncing on iOS and Android */
+  overscroll-behavior: none;
 }
 
 body {
@@ -32,11 +35,16 @@ body {
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  user-select: none;
   overflow: hidden;
-  /* Prevents the "bounce" scroll effect on iOS */
   position: fixed;
   width: 100%;
+
+  /* Robust text selection prevention across all engines */
+  user-select: none;
+  -webkit-user-select: none;
+
+  /* Disables the native iOS long-press context menu (Select/Copy/Look Up) */
+  -webkit-touch-callout: none;
 }
 
 figure {
@@ -78,6 +86,22 @@ h1, h2 {
   height: 300px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+
+  /* CRITICAL: This tells the browser to ignore all native gestures (zoom, pan) on this element.
+     It forces touch events to fire instantly without the 300ms delay. */
+  touch-action: none;
+}
+
+#main-tomato img {
+  height: 100%;
+  width: 100%;
+  aspect-ratio: 1;
+
+  /* Prevents iOS/Android from offering to "Save Image" on rapid or slightly held taps */
+  -webkit-user-drag: none;
+
+  /* Passes all pointer events to the parent <figure> to avoid drag glitches */
+  pointer-events: none;
 }
 
 #main-tomato img:active {
