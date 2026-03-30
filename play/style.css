@@ -10,7 +10,7 @@
   }
 }
 
-@keyframes frase {
+@keyframes phraseDisplay {
   from {
     scale: 0;
     opacity: 0;
@@ -34,6 +34,9 @@ body {
   align-items: center;
   user-select: none;
   overflow: hidden;
+  /* Prevents the "bounce" scroll effect on iOS */
+  position: fixed;
+  width: 100%;
 }
 
 figure {
@@ -87,14 +90,15 @@ h1, h2 {
   height: 200px;
 }
 
-#frase {
+#phrase {
   font-size: 7rem;
-  animation: frase 2s 0.2s ease-in-out backwards;
-  white-space: break-spaces;
+  animation: phraseDisplay 2s 0.2s ease-in-out backwards;
+  white-space: pre-wrap; /* Better for wrapping on small screens */
+  padding: 0 20px;
 }
 
 @media screen and (max-width: 620px) {
-  #frase {
-    font-size: 4rem;
+  #phrase {
+    font-size: 3rem; /* Adjusted for better fit on iPhone screens */
   }
 }
