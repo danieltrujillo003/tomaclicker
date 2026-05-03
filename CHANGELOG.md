@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.1.1] - 2026-04-22
+### Added
+- **Developer Onboarding:** Expanded `README.md` with repository layout, static-hosting constraints (ES modules + `fetch`), local server examples, and deployment guidance for root vs. subpath hosting.
+
+### Changed
+- **Web App Manifest (PWA metadata):** Set `name` / `short_name`, aligned `theme_color` / `background_color` with the play surface, and switched icon `src` entries to paths **relative to the manifest URL** so clients resolve icons under `assets/icons/` without relying on duplicated files at the site root.
+- **Configuration Object Pattern:** Introduced a centralized `TUNING` object in `play/main.js` for phrase timing, climax click count, ducking gains/steps, drop placement, slice asset indices, and post-climax counter multipliers—single source of truth for values that must stay in sync with shipped media.
+- **Data-Driven Scaling:** Replaced sequential hard-coded multiplier branches with a declarative `counterScaleTiers` list and a small application loop, preserving behavior while making tier edits localized and reviewable.
+- **DOM Contract:** Cached the main title (`h1.title`) at module load with other element references so the climax transition does not depend on ad hoc `querySelector` calls at runtime.
+- **Centralized release metadata:** Moved the info page "Last Updated" value out of static HTML into `config.json` as `lastUpdated` (ISO `YYYY-MM-DD`), alongside `version`. `info/main.js` now hydrates `.last-updated` from the same fetch as the version string, keeping ship-facing metadata in one place.
+
+---
+
 ## [1.1.0] - 2026-03-30
 ### Added
 - **High-Performance Audio Engine:** Migrated SFX from HTML5 `<audio>` element pooling to the **Web Audio API** (`AudioContext`), achieving zero-latency playback even during extreme high-CPS (clicks-per-second) interactions.

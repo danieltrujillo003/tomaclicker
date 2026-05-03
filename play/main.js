@@ -4,6 +4,25 @@ const APP_VERSION = config.version;
 
 console.log(`Tomaclicker v${APP_VERSION} initialized.`);
 
+const TUNING = {
+  finalPhraseSongTimeSec: 34.2,
+  climaxClickCount: 95,
+  backgroundSongInitialGain: 0.05,
+  crossfadeStep: 0.005,
+  songGainCap: 1,
+  splashGainFloor: 0.4,
+  counterScaleTiers: [
+    { above: 100, factor: 1.1 },
+    { above: 300, factor: 1.2 },
+    { above: 10000, factor: 1.3 },
+    { above: 1000000, factor: 2.0 },
+  ],
+  dropLeftPercentMin: -10,
+  dropLeftPercentMax: 100,
+  sliceImageIndexMin: 1,
+  sliceImageIndexMax: 5,
+};
+
 // ==========================================
 // 1. DOM ELEMENTS & GLOBAL STATE
 // ==========================================
@@ -11,6 +30,7 @@ const mainTomato = document.getElementById('main-tomato');
 const counterDisplay = document.getElementById('counter-display');
 const tomatoSong = document.getElementById('tomato-song');
 const phrase = document.getElementById('phrase');
+const titleHeading = document.querySelector('h1.title');
 
 // Initial UI State
 // Initial counterDisplay masks the first silent tap required to unlock iOS audio policies
@@ -58,7 +78,7 @@ const playSplash = () => {
 
 // Syncing UI events to the media clock rather than the JS Event Loop to avoid drift
 const checkEndingTime = () => {
-  if (tomatoSong.currentTime >= 34.2) {
+  if (tomatoSong.currentTime >= TUNING.finalPhraseSongTimeSec) {
     finalPhrase();
     tomatoSong.removeEventListener('timeupdate', checkEndingTime);
   }
@@ -76,10 +96,10 @@ const createDrop = () => {
   requestAnimationFrame(() => {
     const tomaDrop = document.createElement('figure');
     tomaDrop.className = 'toma-drop';
-    tomaDrop.style.left = `${getRandomBetween(100, -10)}%`;
+    tomaDrop.style.left = `${getRandomBetween(TUNING.dropLeftPercentMax, TUNING.dropLeftPercentMin)}%`;
 
     const dropImg = document.createElement('img');
-    dropImg.src = `../assets/slice${getRandomBetween(5, 1)}.png`;
+    dropImg.src = `../assets/slice${getRandomBetween(TUNING.sliceImageIndexMax, TUNING.sliceImageIndexMin)}.png`;
     dropImg.onerror = () => { dropImg.src = '../assets/default.png'; };
     dropImg.draggable = false;
 
@@ -94,31 +114,36 @@ const createDrop = () => {
 
 const finalPhrase = () => {
   phrase.style.display = 'block';
-  document.querySelector('h1.title').style.display = 'none';
+  titleHeading.style.display = 'none';
   mainTomato.style.display = 'none';
   counterDisplay.style.display = 'none';
 };
 
 const triggerGameLogicUI = () => {
-  if (counterStart === 95) {
-    songGainNode.gain.value = 0.05;
+  if (counterStart === TUNING.climaxClickCount) {
+    songGainNode.gain.value = TUNING.backgroundSongInitialGain;
     tomatoSong.play().catch(() => console.log("Playback blocked natively."));
   }
 
   // Audio Ducking: Crossfade background music and SFX to shift user focus
-  if (counterStart > 95) {
-    if (songGainNode.gain.value < 1) {
-      songGainNode.gain.value = Math.min(1, songGainNode.gain.value + 0.005);
+  if (counterStart > TUNING.climaxClickCount) {
+    if (songGainNode.gain.value < TUNING.songGainCap) {
+      songGainNode.gain.value = Math.min(
+        TUNING.songGainCap,
+        songGainNode.gain.value + TUNING.crossfadeStep,
+      );
     }
-    if (splashGainNode.gain.value > 0.4) {
-      splashGainNode.gain.value = Math.max(0.4, splashGainNode.gain.value - 0.005);
+    if (splashGainNode.gain.value > TUNING.splashGainFloor) {
+      splashGainNode.gain.value = Math.max(
+        TUNING.splashGainFloor,
+        splashGainNode.gain.value - TUNING.crossfadeStep,
+      );
     }
   }
 
-  if (counterStart > 100) counterStart *= 1.1;
-  if (counterStart > 300) counterStart *= 1.2;
-  if (counterStart > 10000) counterStart *= 1.3;
-  if (counterStart > 1000000) counterStart *= 2.0;
+  for (const tier of TUNING.counterScaleTiers) {
+    if (counterStart > tier.above) counterStart *= tier.factor;
+  }
 
   counterDisplay.innerText = Math.floor(counterStart);
   createDrop();

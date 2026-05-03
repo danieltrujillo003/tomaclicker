@@ -1,7 +1,10 @@
 const configRes = await fetch('../config.json');
 const config = await configRes.json();
-const APP_VERSION = config.version;
 
-document.querySelectorAll('.version').forEach(el => {
-    el.innerText = APP_VERSION;
+document.querySelectorAll('.version').forEach((el) => {
+  el.innerText = config.version;
+});
+
+document.querySelectorAll('.last-updated').forEach((el) => {
+  el.innerText = config.lastUpdated ?? '';
 });

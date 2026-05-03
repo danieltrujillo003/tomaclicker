@@ -21,7 +21,8 @@ h1 {
   padding-bottom: 10px;
 }
 
-.version {
+.version,
+.last-updated {
   font-weight: bold;
   font-size: 1.2rem;
 }
