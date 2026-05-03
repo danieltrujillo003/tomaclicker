@@ -22,14 +22,23 @@
   }
 }
 
-html, body {
+html {
+  box-sizing: border-box;
   height: 100%;
 
   /* Modern standard to completely disable rubber-band bouncing on iOS and Android */
   overscroll-behavior: none;
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
 body {
+  height: 100%;
+  overscroll-behavior: none;
   background: #00FF7F;
   display: flex;
   flex-direction: column;
@@ -37,7 +46,14 @@ body {
   align-items: center;
   overflow: hidden;
   position: fixed;
+  inset: 0;
   width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding-left: max(0px, env(safe-area-inset-left));
+  padding-right: max(0px, env(safe-area-inset-right));
+  padding-top: max(0px, env(safe-area-inset-top));
+  padding-bottom: max(0px, env(safe-area-inset-bottom));
 
   /* Robust text selection prevention across all engines */
   user-select: none;
@@ -62,6 +78,7 @@ figure img {
 
 .toma-drop {
   width: 80px;
+  height: 80px;
   position: absolute;
   animation: drop 3s 0.1s ease-in-out backwards;
   z-index: -1;
@@ -75,15 +92,28 @@ h1, h2 {
   text-align: center;
   display: flex;
   align-items: center;
+  justify-content: center;
   margin: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .title {
   font-size: 80px;
+  padding-inline: 8px;
+  flex-shrink: 0;
 }
 
 #main-tomato {
   height: 300px;
+  max-width: 100%;
+  margin-inline: auto;
+  align-self: center;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 
@@ -111,14 +141,33 @@ h1, h2 {
 #counter-display {
   font-size: 60px;
   word-break: break-all;
+  overflow-wrap: anywhere;
   height: 200px;
+  padding-inline: 12px;
+  box-sizing: border-box;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1.15;
+  flex-shrink: 0;
 }
 
 #phrase {
   font-size: 7rem;
   animation: phraseDisplay 2s 0.2s ease-in-out backwards;
   white-space: pre-wrap; /* Better for wrapping on small screens */
-  padding: 0 20px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0.5em max(20px, env(safe-area-inset-right)) 0.5em max(20px, env(safe-area-inset-left));
+  z-index: 2;
 }
 
 @media screen and (max-width: 620px) {

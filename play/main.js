@@ -17,8 +17,9 @@ const TUNING = {
     { above: 10000, factor: 1.3 },
     { above: 1000000, factor: 2.0 },
   ],
-  dropLeftPercentMin: -10,
-  dropLeftPercentMax: 100,
+  /* Slice horizontal *center* (% of viewport). Symmetric past 0–100 so rain clips left and right evenly; must match `.toma-drop` width (80px → 40px in calc). */
+  dropCenterPercentMin: -10,
+  dropCenterPercentMax: 110,
   sliceImageIndexMin: 1,
   sliceImageIndexMax: 5,
 };
@@ -92,11 +93,17 @@ const getRandomBetween = (max, min = 0) => {
   return Math.floor(Math.random() * (max - min + 1) + min);
 };
 
+const DROP_HALF_PX = 40;
+
 const createDrop = () => {
   requestAnimationFrame(() => {
     const tomaDrop = document.createElement('figure');
     tomaDrop.className = 'toma-drop';
-    tomaDrop.style.left = `${getRandomBetween(TUNING.dropLeftPercentMax, TUNING.dropLeftPercentMin)}%`;
+    const centerPct = getRandomBetween(
+      TUNING.dropCenterPercentMax,
+      TUNING.dropCenterPercentMin,
+    );
+    tomaDrop.style.left = `calc(${centerPct}% - ${DROP_HALF_PX}px)`;
 
     const dropImg = document.createElement('img');
     dropImg.src = `../assets/slice${getRandomBetween(TUNING.sliceImageIndexMax, TUNING.sliceImageIndexMin)}.png`;
@@ -113,7 +120,7 @@ const createDrop = () => {
 };
 
 const finalPhrase = () => {
-  phrase.style.display = 'block';
+  phrase.style.display = 'flex';
   titleHeading.style.display = 'none';
   mainTomato.style.display = 'none';
   counterDisplay.style.display = 'none';
